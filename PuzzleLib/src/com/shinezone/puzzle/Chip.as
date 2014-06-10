@@ -39,6 +39,7 @@ package com.shinezone.puzzle
 				case MouseEvent.MOUSE_DOWN:
 				{
 					this.startDrag();
+					//trace(x + "__" + y);
 					break;
 				}
 					

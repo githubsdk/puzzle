@@ -11,6 +11,7 @@ package com.shinezone.puzzle
 	import flash.filters.BevelFilter;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import flash.net.URLRequest;
 
 	public class Puzzle
@@ -27,7 +28,6 @@ package com.shinezone.puzzle
 		////////////////////////////////
 		////////////////////////////////
 		private var _oldURL:String;
-		private var _newURL:String;
 		private var _x:Number;
 		private var _y:Number;
 		private var _row:Number;
@@ -48,15 +48,24 @@ package com.shinezone.puzzle
 		private var _pieceOWH_k:Number = 3/4;
 		
 		private var _container:DisplayObjectContainer;
+		private var _source:Object;
+		
+		private const START:Number = 20;
 		/////////////////////////////////
 		/**
 		 * Constructor
 		 */
-		public function Puzzle(container:DisplayObjectContainer, imageLink:String) {
+		public function Puzzle(container:DisplayObjectContainer, source:Object) {
 			_container = container;
-			_newURL = imageLink;
-			loadImage(_newURL);
+			_source = source;
+			loadImage(_source);
 		}
+
+		public function get chips():Array
+		{
+			return _chips;
+		}
+
 		/**
 		 * Public methods
 		 */
@@ -83,13 +92,17 @@ package com.shinezone.puzzle
 			removeAllPiece();
 			_chips ||= new Array();
 			_chips.length = 0;
+			var index:int = 0;
 			for (var i:Number = 0; i<_row; i++) {
 				for (var j:Number = 0; j<_line; j++) {
 					//var chip:Chip = new Chip(_imageBitmap, i, j, _pieceW, _pieceH);
 					var chip:Chip = new Chip();
 					_chips[_line*i+j] = chip;
+					chip.name = index.toString();
+					index++;
 					//if(j%2==0)
-						chip.graphics.beginBitmapFill(_imageBitmap, new Matrix(1, 0, 0, 1, -j*_pieceW, -i*_pieceH), true, true);
+					var scale:Number = 1;
+						chip.graphics.beginBitmapFill(_imageBitmap, new Matrix(scale, 0, 0, scale, -j*_pieceW, -i*_pieceH), true, true);
 					/*else
 					{
 						if(i%2==0)
@@ -98,11 +111,13 @@ package com.shinezone.puzzle
 							chip.graphics.beginFill(0xff0000);
 					}*/
 					//chip.graphics.drawRect(0, 0, _pieceW, _pieceH);
-					chip.x = j*_pieceW;
-					chip.y = i*_pieceH;
+					chip.x = START + j*_pieceW;
+					chip.y = START + i*_pieceH;
 					drawPiece(chip, getAllDotArray(chip, i, j, _line*i+j));
 					chip.filters = [new BevelFilter(3, 30)];
 					_container.addChild(chip);
+					var rect:Rectangle = chip.getBounds(chip);
+					trace(chip.name + "_" + _pieceW + "_" + _pieceH + "_" + rect.toString());
 				}
 			}
 		}
@@ -147,12 +162,16 @@ package com.shinezone.puzzle
 		/**
 		 * Private methods
 		 */
-		private function loadImage(url:String):void {
-			_newURL = url;
+		private function loadImage(source:Object):void {
 			try {
-				_imageLoader ||= new Loader();
-				_imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
-				_imageLoader.load(new URLRequest(url));
+				if(source is String)
+				{
+					_imageLoader ||= new Loader();
+					_imageLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
+					_imageLoader.load(new URLRequest(String(source)));
+				}else if(source is DisplayObject){
+					onLoadInit(DisplayObject(source));
+				}
 			} catch (e:Error) {
 				trace(e);
 			}
@@ -165,7 +184,6 @@ package com.shinezone.puzzle
 		}
 		
 		private function onLoadInit(target:DisplayObject):void {
-			_oldURL = _newURL;
 			if (target.width<10 || target.height<10) {
 				throw new Error("图片太小,不适合切割!");
 			}
@@ -182,10 +200,12 @@ package com.shinezone.puzzle
 		}
 		private function mcToBitmap(mc:DisplayObject):void {
 			_imageBitmap = new BitmapData(_imageW, _imageH);
-			_imageBitmap.draw(mc);
+			var scale:Number = 1;
+			_imageBitmap.draw(mc, new Matrix(scale, 0, 0, scale));
 			
 			var bmp:Bitmap = new Bitmap(_imageBitmap);
-			bmp.x = bmp.width;
+			bmp.x = bmp.width+START*2;
+			bmp.y = START;
 			_container.addChild(bmp);
 			//隐藏掉
 			_pieceBoard = new MovieClip();
