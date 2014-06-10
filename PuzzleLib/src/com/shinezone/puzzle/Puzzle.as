@@ -61,6 +61,16 @@ package com.shinezone.puzzle
 			loadImage(_source);
 		}
 
+		public function get pieceH():Number
+		{
+			return _pieceH;
+		}
+
+		public function get pieceW():Number
+		{
+			return _pieceW;
+		}
+
 		public function get chips():Array
 		{
 			return _chips;

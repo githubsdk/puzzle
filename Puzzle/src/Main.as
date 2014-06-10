@@ -93,7 +93,9 @@ package
 				text.filters = [new GlowFilter(0xff00ff)];
 				chip.addChild(text);
 			}
+			content.substr(content.length-2,1);
 			fs.open(info, FileMode.WRITE);
+			content = content + ";"+puzzle.pieceW+","+puzzle.pieceH;
 			fs.writeMultiByte(content,"utf-8");
 			fs.close();
 			

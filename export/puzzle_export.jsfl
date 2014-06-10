@@ -8,7 +8,7 @@ var _stopFrame = 3;
 //文件名
 var NAME = "muban";
 //模板名字
-var suffix = ".fla";
+var suffix = ".png";
 var templeteName = NAME+suffix;
 //模板文件完整路径
 var templeteFullPath = null;
@@ -26,6 +26,8 @@ var currentFileName = null;
 var destPath = null;
 //记录导出的文件名
 var allPNG = "";
+//物品资源模板
+var itemDom = null;
 /*
 参数 格式 
 name1=h-name2=v-name3=vh
@@ -39,7 +41,11 @@ var params = "";
 start();
 function start()
 {
-        var folder = fl.browseForFolderURL("选择资源文件夹");
+		var url = fl.browseForFileURL("open", "选择物品资源模板");
+		if(url==null)
+			return;
+		itemDom = fl.openDocument(url);
+        var folder = fl.browseForFolderURL("选择图块资源文件夹");
         if (! folder)
         {
                 return;
@@ -163,6 +169,7 @@ function buildTempletePath(path, fileName)
 
 function publish(paths)
 {
+/*
         if (paths.length > 20)
         {
                 if (! confirm("文件比较多(" + paths.length + ")个,是否继续?"))
@@ -170,6 +177,7 @@ function publish(paths)
                         return;
                 }
         }
+*/
         fl.outputPanel.clear();
         trace("开始批量发布");
 		
@@ -187,54 +195,15 @@ function publish(paths)
 		
         for each (var path in paths)
         {
-			
-				//跳过模板
-				if(path.search(templeteName)>=0)
+				trace(path);
+				//跳过非png文件
+				if(path.search(suffix)<=0)
 				{
 					continue;
 				}
-				
-				//打开资源
-				sourceDom = fl.openDocument(path);
-				buildTempletePath(path, sourceDom.name);
-				currentPath = path;
-				currentFileName = sourceDom.name;
-				spliceNameAndFrame(path);
-				
-				 var lib = sourceDom.library
-				sourceDom.library.selectNone()
-				var b = lib.selectItem("Templete");
-				
-				b = lib.addItemToDocument({x:100,y:100});
-				sourceDom.publish();
-				sourceDom.selectAll();
-				for each(var elem in sourceDom.selection)
-				{
-					trace(sourceDom.selection.length + "_" + elem.name);
-				}
-				return;
-				// trace(lib.getSelectedItems()[0]+b+startID);
-				var b = lib.editItem(startID);
-				var tl = lib.getSelectedItems()[0].timeline;
-				//选择包含有效资源的图层
-				for(var i=0; i < tl.layers.length; ++i)
-				{
-					var layer = tl.layers[i];
-					if(layer.frameCount==iVersion&&layer.layerType!="guided")
-					{
-						tl.currentLayer = i;
-						break;
-					}
-				}
-				
-				tl.copyFrames(iVersion-1);
-				tl.pasteFrames(0);
-				//sourceDom.clipCopy();
-				
-				var e = exportPNG();
-				//trace(e);
-				
-				fl.closeDocument(sourceDom, false);
+				//导入文件
+				itemDom.importFile(path, true);
+				//fl.closeDocument(sourceDom, false);
         }
        trace(allPNG);
 }
@@ -255,7 +224,7 @@ function getFolders(folder)
 function getAllFiles(folder)
 {
         //递归得到文件夹内所有as文件
-        var list = getFiles(folder, "fla").concat(getFiles(folder, "xfl"));
+        var list = getFiles(folder, "png").concat(getFiles(folder, "xfl"));
         var i = 0;
         for each (var file in list)
         {
