@@ -50,7 +50,7 @@ package com.shinezone.puzzle
 		private var _container:DisplayObjectContainer;
 		private var _source:Object;
 		
-		private const START:Number = 20;
+		private const START:Number = 0;
 		private var _scale:Number;
 		/////////////////////////////////
 		/**

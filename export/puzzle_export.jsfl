@@ -87,7 +87,7 @@ function exportItem()
 		itemDom.selection[0].x = Number(pos.x)-chipWidth/2;
 		itemDom.selection[0].y = Number(pos.y)-chipHeight/2;
 		itemDom.selection[0].scaleX = itemDom.selection[0].scaleY = scale;
-		//itemDom.moveSelectionBy({x:pos.x, y:pos.y});
+		itemDom.traceBitmap(1,1,"smooth", "normal");
 		var path = destPath+"/"+key+".swf";
 		trace(path);
 		itemDom.exportSWF(path);
@@ -152,7 +152,7 @@ function spliceNameAndFrame(path)
 	parts = name.split("_");
 	startID = parts[0];
 	startID = startID.replace("[d]", currentFileName.replace(".fla", ""))
-	iVersion = parts[1];
+	iVersion = parts[0];
 	params = parts[2] || "";
 }
 
