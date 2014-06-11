@@ -28,6 +28,11 @@ var destPath = null;
 var allPNG = "";
 //物品资源模板
 var itemDom = null;
+//图块矩形宽高
+var chipWidth = 0;
+var chipHeight = 0;
+//图块形状信息列表
+var chipInfo = null;
 /*
 参数 格式 
 name1=h-name2=v-name3=vh
@@ -63,38 +68,30 @@ function start()
         }
 }
 //导出
-function exportPNG()
+function exportItem()
 {
-	var target = fl.openDocument(templeteFullPath);
-	var lib = target.library;
-	lib.editItem("empty");
-	lib.selectItem("empty");
-	var tl = lib.getSelectedItems()[0].timeline;
-	//trace(tl.frameCount)
-	tl.pasteFrames(0);	
-	target.exitEditMode();
-	var path = currentPath.replace(currentFileName, "");
-	var savepath = FLfile.uriToPlatformPath(destPath) +"\\"+ currentFileName.replace(".fla", "");
-	
-	//修改导出配置
-	var profile = target.exportPublishProfileString();
-	var pngname = currentFileName.replace(".fla", ".png");
-	profile = profile.replace("<defaultNames>1</defaultNames>", "<defaultNames>0</defaultNames>");
-	profile = profile.replace("<pngDefaultName>1</pngDefaultName>", "<pngDefaultName>0</pngDefaultName>");
-	profile = profile.replace("<pngFileName>"+NAME+"</pngFileName>", "<pngFileName>11"+pngname+"</pngFileName>");
-	//trace(profile)
-	while(profile.indexOf(NAME)!=-1)
+	var lib = itemDom.library;
+	var scale = 1;
+	for (var key in chipInfo)
 	{
-		profile = profile.replace(NAME, savepath);
+		lib.editItem("Icon");
+		itemDom.selectAll();
+		if(itemDom.selection!=null && itemDom.selection.length>0)
+			itemDom.deleteSelection();
+		lib.selectItem(key + ".png");
+		var item = lib.getSelectedItems();
+		lib.addItemToDocument({x:0, y:0});
+		
+		itemDom.selectAll();
+		var pos = chipInfo[key];
+		itemDom.selection[0].x = Number(pos.x)-chipWidth/2;
+		itemDom.selection[0].y = Number(pos.y)-chipHeight/2;
+		itemDom.selection[0].scaleX = itemDom.selection[0].scaleY = scale;
+		//itemDom.moveSelectionBy({x:pos.x, y:pos.y});
+		var path = destPath+"/"+key+".swf";
+		trace(path);
+		itemDom.exportSWF(path);
 	}
-	target.importPublishProfileString(profile);
-	updateItems(target);
-	//发布文件
-	//trace(target.exportPublishProfileString());
-	target.publish(savepath, true);
-	allPNG = allPNG + "\n" + savepath;
-	fl.closeDocument(target, false);
-	return profile;
 }
 
 function updateItems(dom)
@@ -166,46 +163,48 @@ function buildTempletePath(path, fileName)
 	templeteFullPath = path.replace(fileName, templeteName);
 }
 
+//解析信息文件内容
+function parseInfo(content)
+{
+	var infos = content.split(";");
+	
+	var rect = infos[0].split("|");
+	chipInfo = {};
+	for each(var str in rect)
+	{
+		var tmp = str.split(",");
+		chipInfo[tmp[0]] = {x:tmp[1], y:tmp[2]};
+	}
+	
+	var wh = infos[1].split(",");
+	chipWidth = wh[0];
+	chipHeight = wh[1];
+}
 
 function publish(paths)
-{
-/*
-        if (paths.length > 20)
-        {
-                if (! confirm("文件比较多(" + paths.length + ")个,是否继续?"))
-                {
-                        return;
-                }
-        }
-*/
-        fl.outputPanel.clear();
-        trace("开始批量发布");
-		
-		/*
-		for each (var path in paths)
-        {
-				//跳过模板
-				if(path.search(templeteName)>=0)
-				{
-					templeteFullPath = path;
-					break
-				}
-		}
-		*/
-		
+{		
         for each (var path in paths)
         {
-				trace(path);
-				//跳过非png文件
-				if(path.search(suffix)<=0)
+				
+				if(path.search(".txt")>0)
 				{
+					var content = FLfile.read(path);
+					if(content!=null)
+						parseInfo(content);
+				}
+				else if(path.search(suffix)<=0)
+				{
+					//跳过非png文件
 					continue;
 				}
 				//导入文件
 				itemDom.importFile(path, true);
 				//fl.closeDocument(sourceDom, false);
         }
-       trace(allPNG);
+		
+		exportItem();
+		fl.closeDocument(itemDom, false);
+       //trace(allPNG);
 }
 
 function trace(string)
@@ -224,7 +223,7 @@ function getFolders(folder)
 function getAllFiles(folder)
 {
         //递归得到文件夹内所有as文件
-        var list = getFiles(folder, "png").concat(getFiles(folder, "xfl"));
+        var list = getFiles(folder, "png").concat(getFiles(folder, "txt"));
         var i = 0;
         for each (var file in list)
         {

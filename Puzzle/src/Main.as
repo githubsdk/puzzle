@@ -62,7 +62,7 @@ package
 		{
 			_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onComplete);
 			var cls:Class = _loader.contentLoaderInfo.applicationDomain.getDefinition("Templete") as Class;
-			var puzzle:Puzzle = new Puzzle(this, new cls());
+			var puzzle:Puzzle = new Puzzle(this, new cls(), 1);
 			var path:String = _file.nativePath;
 			var patharray:Array = path.split("\\");
 			patharray.pop();
@@ -70,12 +70,13 @@ package
 			var info:File = new File(path+"\\info.txt");
 			var content:String = "";
 			var fs:FileStream = new FileStream();
+			var scale:Number = 1;
 			for each(var chip:Chip in puzzle.chips)
 			{
 				var bmp:Bitmap = new Bitmap();
-				bmp.bitmapData = new BitmapData(chip.width, chip.height, true, 0x00000000);
+				bmp.bitmapData = new BitmapData(chip.width * scale, chip.height * scale, true, 0x00000000);
 				var rect:Rectangle = chip.getBounds(chip);
-				bmp.bitmapData.draw(chip, new Matrix(1,0,0,1,-rect.x, -rect.y));
+				bmp.bitmapData.draw(chip, new Matrix(scale,0,0,scale,-rect.x*scale, -rect.y*scale));
 				var ba:ByteArray = PNGEncoder.encode(bmp.bitmapData);
 				var id:int = int(_controls.input.text) + int(chip.name);
 				var fp:String = path+"\\"+ id +".png";
@@ -83,7 +84,7 @@ package
 				fs.open(fl, FileMode.WRITE);
 				fs.writeBytes(ba);
 				fs.close();
-				content = content + id + ","+rect.x + "," + rect.y + "|";
+				content = content + id + ","+(rect.x * scale) + "," + (rect.y * scale) + "|";
 				var text:TextField = new TextField();
 				text.width = 50;
 				text.autoSize = TextFieldAutoSize.RIGHT;
@@ -93,9 +94,9 @@ package
 				text.filters = [new GlowFilter(0xff00ff)];
 				chip.addChild(text);
 			}
-			content.substr(content.length-2,1);
+			content = content.substr(0,content.length-1);
 			fs.open(info, FileMode.WRITE);
-			content = content + ";"+puzzle.pieceW+","+puzzle.pieceH;
+			content = content + ";"+(puzzle.pieceW*scale)+","+(puzzle.pieceH*scale);
 			fs.writeMultiByte(content,"utf-8");
 			fs.close();
 			

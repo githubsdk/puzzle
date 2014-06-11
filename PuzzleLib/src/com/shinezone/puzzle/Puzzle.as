@@ -51,13 +51,15 @@ package com.shinezone.puzzle
 		private var _source:Object;
 		
 		private const START:Number = 20;
+		private var _scale:Number;
 		/////////////////////////////////
 		/**
 		 * Constructor
 		 */
-		public function Puzzle(container:DisplayObjectContainer, source:Object) {
+		public function Puzzle(container:DisplayObjectContainer, source:Object, scale:Number) {
 			_container = container;
 			_source = source;
+			_scale = scale;
 			loadImage(_source);
 		}
 
@@ -111,8 +113,7 @@ package com.shinezone.puzzle
 					chip.name = index.toString();
 					index++;
 					//if(j%2==0)
-					var scale:Number = 1;
-						chip.graphics.beginBitmapFill(_imageBitmap, new Matrix(scale, 0, 0, scale, -j*_pieceW, -i*_pieceH), true, true);
+						chip.graphics.beginBitmapFill(_imageBitmap, new Matrix(1, 0, 0, 1, -j*_pieceW, -i*_pieceH), true, true);
 					/*else
 					{
 						if(i%2==0)
@@ -124,7 +125,7 @@ package com.shinezone.puzzle
 					chip.x = START + j*_pieceW;
 					chip.y = START + i*_pieceH;
 					drawPiece(chip, getAllDotArray(chip, i, j, _line*i+j));
-					chip.filters = [new BevelFilter(3, 30)];
+					chip.filters = [new BevelFilter(1, 30)];
 					_container.addChild(chip);
 					var rect:Rectangle = chip.getBounds(chip);
 					trace(chip.name + "_" + _pieceW + "_" + _pieceH + "_" + rect.toString());
@@ -194,6 +195,7 @@ package com.shinezone.puzzle
 		}
 		
 		private function onLoadInit(target:DisplayObject):void {
+			target.scaleX = target.scaleY = _scale;
 			if (target.width<10 || target.height<10) {
 				throw new Error("图片太小,不适合切割!");
 			}
@@ -210,8 +212,7 @@ package com.shinezone.puzzle
 		}
 		private function mcToBitmap(mc:DisplayObject):void {
 			_imageBitmap = new BitmapData(_imageW, _imageH);
-			var scale:Number = 1;
-			_imageBitmap.draw(mc, new Matrix(scale, 0, 0, scale));
+			_imageBitmap.draw(mc, new Matrix(_scale, 0, 0, _scale));
 			
 			var bmp:Bitmap = new Bitmap(_imageBitmap);
 			bmp.x = bmp.width+START*2;
