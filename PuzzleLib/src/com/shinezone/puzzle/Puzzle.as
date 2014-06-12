@@ -50,7 +50,7 @@ package com.shinezone.puzzle
 		private var _container:DisplayObjectContainer;
 		private var _source:Object;
 		
-		private const START:Number = 0;
+		private const START:Number = 20;
 		private var _scale:Number;
 		/////////////////////////////////
 		/**
@@ -211,7 +211,7 @@ package com.shinezone.puzzle
 			mcToBitmap(target);
 		}
 		private function mcToBitmap(mc:DisplayObject):void {
-			_imageBitmap = new BitmapData(_imageW, _imageH);
+			_imageBitmap = new BitmapData(_imageW, _imageH, true, 0);
 			_imageBitmap.draw(mc, new Matrix(_scale, 0, 0, _scale));
 			
 			var bmp:Bitmap = new Bitmap(_imageBitmap);
@@ -234,10 +234,11 @@ package com.shinezone.puzzle
 		}
 		private function getRndD():Number {
 			//返回与边界错开的高度
-			return _pieceD-Math.random()*2*_pieceD;
+			//return _pieceD-Math.random()*2*_pieceD;
+			return -_pieceD;
 		}
 		private function drawPiece(mc:Sprite, dotArr:Array):void {
-			mc.graphics.lineStyle(0);
+			mc.graphics.lineStyle(null, 0, 0);
 			mc.graphics.moveTo(0, 0);
 			for (var k:Number = 0; k<dotArr.length; k++) {
 				if (dotArr[k] is Point) {
@@ -249,7 +250,7 @@ package com.shinezone.puzzle
 			mc.graphics.endFill();
 		}
 		private function getOvalDotArray(mc:Sprite, position:String):Array {
-			var rnd:Number = Math.random()>0.5 ? 1 : -1;
+			var rnd:Number = 1;//Math.random()>0.5 ? 1 : -1;
 			var circleDotArr:Array = [];
 			switch (position) {
 				case "right" :

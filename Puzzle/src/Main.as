@@ -37,16 +37,29 @@ package
 			_controls = new Controls();
 			addChild(_controls);
 			_controls.input.type = TextFieldType.INPUT;
-			_controls.input.restrict = "0-9";
-			_controls.button.enabled = false;
-			_controls.button.addEventListener(MouseEvent.CLICK, onMouseHandler);
+			//_controls.input.restrict = "0-9";
+			_controls.importpic.addEventListener(MouseEvent.CLICK, onMouseHandler);
+			_controls.appdir.addEventListener(MouseEvent.CLICK, onMouseHandler);
 		}
 		
 		protected function onMouseHandler(e:MouseEvent):void
 		{
-			_file = new File();
-			_file.browseForOpen("打开要转换的 文件", [new FileFilter("*.swf","*.swf")]);
-			_file.addEventListener(Event.SELECT, onSelected);
+			switch(e.currentTarget)
+			{
+				case _controls.importpic:
+				{
+					_file = new File();
+					_file.browseForOpen("打开要转换的 文件", [new FileFilter("*.swf","*.swf")]);
+					_file.addEventListener(Event.SELECT, onSelected);
+					break;
+				}
+					
+				case _controls.appdir:
+				{
+					File.applicationDirectory.openWithDefaultApplication();
+					break;
+				}
+			}
 		}
 		
 		
@@ -108,6 +121,10 @@ package
 			fs.open(all, FileMode.WRITE);
 			fs.writeBytes(ba);
 			fs.close();
+			
+			//var jsfl:String = File.applicationDirectory.nativePath + "\\export\\puzzle_export.jsfl";
+			var jsfl:File = File.applicationDirectory.resolvePath("export\\puzzle_export.jsfl");
+			jsfl.openWithDefaultApplication();
 		}
 	}
 }
