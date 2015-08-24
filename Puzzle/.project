@@ -3,7 +3,6 @@
 	<name>Puzzle</name>
 	<comment></comment>
 	<projects>
-		<project>PuzzleLib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -21,11 +20,4 @@
 		<nature>com.adobe.flexbuilder.project.apollonature</nature>
 		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>[source path] src</name>
-			<type>2</type>
-			<location>/Users/Vector/work_shinezone/flash/src</location>
-		</link>
-	</linkedResources>
 </projectDescription>

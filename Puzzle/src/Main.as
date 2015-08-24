@@ -1,6 +1,5 @@
 package
 {
-	import com.adobe.images.PNGEncoder;
 	import com.shinezone.puzzle.Chip;
 	import com.shinezone.puzzle.Puzzle;
 	
@@ -29,6 +28,8 @@ package
 	import foozuu.app.App;
 	import foozuu.app.AppConfig;
 	import foozuu.app.AppData;
+	
+	import images.PNGEncoder;
 	
 	public class Main extends Sprite
 	{
