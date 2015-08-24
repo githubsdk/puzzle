@@ -56,6 +56,8 @@ package
 			}
 			_controls.rows.text = value;
 			value = App.ins.appData.getData("cols");
+			
+			_controls.help.htmlText = App.ins.appConfig.getData("help");
 			if(value==null)
 			{
 				value = App.ins.appConfig.getData("cols");
