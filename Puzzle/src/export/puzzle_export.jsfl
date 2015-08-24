@@ -42,29 +42,53 @@ v=垂直居中
 h=水平居中
 */
 var params = "";
+
+var included = {};
+function include(file) {
+	if (included[file]) { return; }
+	included[file] = true;
+	eval(FLfile.read(SCRIPT_PATH+file+".jsfl"));
+}
+
+var SCRIPT_PATH = getFolderPath(fl.scriptURI,1);
+
+var OUT_PUT_CONTENT = FLfile.read(getFolderPath(fl.scriptURI,2)+"info.json");
+
+include("JSON");
+PUBLISH_INFO = JSON.decode(OUT_PUT_CONTENT);
+
+function getFolderPath(url,popCount)
+{
+	//var url = fl.scriptURI;
+
+	var parts = url.split("/");
+	var script_name;
+	for(var i=0;i<popCount;++i)
+	{
+		script_name = parts.pop();
+	}
+	
+	url = parts.join("/");
+	return url+"/";
+}
+
  
 start();
 function start()
 {
-		var url = fl.browseForFileURL("open", "选择物品资源模板");
-		if(url==null)
-			return;
+		var url = SCRIPT_PATH+"item.fla";
 		itemDom = fl.openDocument(url);
-        var folder = fl.browseForFolderURL("选择图块资源文件夹");
-        if (! folder)
-        {
-                return;
-        }
-		destPath = fl.browseForFolderURL("选择导出目标文件夹");
-        if (! destPath)
-        {
-                return;
-        }
+        var folder = PUBLISH_INFO.folder;
+       
+		destPath = folder;
+        
 		trace(destPath);
         var paths = getAllFiles(folder);
+        publish(paths);
+        return;
         if (confirm("将要批量导出" + paths.length + "个文件"))
         {
-                publish(paths);
+                //publish(paths);
         }
 }
 //导出
@@ -166,33 +190,23 @@ function buildTempletePath(path, fileName)
 //解析信息文件内容
 function parseInfo(content)
 {
-	var infos = content.split(";");
 	
-	var rect = infos[0].split("|");
 	chipInfo = {};
-	for each(var str in rect)
+	for each(var pos in PUBLISH_INFO.pos)
 	{
-		var tmp = str.split(",");
-		chipInfo[tmp[0]] = {x:tmp[1], y:tmp[2]};
+		chipInfo[pos.id] = {x:pos.x, y:pos.y};
 	}
-	
-	var wh = infos[1].split(",");
-	chipWidth = wh[0];
-	chipHeight = wh[1];
+
+	chipWidth = PUBLISH_INFO.size.width;
+	chipHeight = PUBLISH_INFO.size.height;
 }
 
 function publish(paths)
 {		
+		parseInfo(null);
         for each (var path in paths)
         {
-				
-				if(path.search(".txt")>0)
-				{
-					var content = FLfile.read(path);
-					if(content!=null)
-						parseInfo(content);
-				}
-				else if(path.search(suffix)<=0)
+				if(path.search(suffix)<=0)
 				{
 					//跳过非png文件
 					continue;

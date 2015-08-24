@@ -42,11 +42,30 @@ v=垂直居中
 h=水平居中
 */
 var params = "";
+
+var SCRIPT_PATH = getFolderPath(fl.scriptURI,0);
+
+var OUT_PUT_CONTENT = FLfile.read(getFolderPath(fl.scriptURI,1)+"info.json");
+
+function getFolderPath(url,popCount)
+{
+	//var url = fl.scriptURI;
+
+	var parts = url.split("/");
+	var script_name;
+	for(var i=0;i<popCount;++i)
+	{
+		script_name = parts.pop();
+	}
+	
+	url = parts.join("/");
+	return url+"/";
+}
  
 start();
 function start()
 {
-		var url = fl.browseForFileURL("open", "选择物品资源模板");
+		var url = SCRIPT_PATH+"item.fla";
 		if(url==null)
 			return;
 		itemDom = fl.openDocument(url);

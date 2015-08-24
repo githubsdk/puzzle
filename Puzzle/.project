@@ -3,6 +3,7 @@
 	<name>Puzzle</name>
 	<comment></comment>
 	<projects>
+		<project>PuzzleLib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -24,7 +25,7 @@
 		<link>
 			<name>[source path] src</name>
 			<type>2</type>
-			<location>E:/as3corelib-master/src</location>
+			<location>/Users/Vector/work_shinezone/flash/src</location>
 		</link>
 	</linkedResources>
 </projectDescription>

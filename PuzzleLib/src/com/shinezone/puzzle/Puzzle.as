@@ -56,10 +56,11 @@ package com.shinezone.puzzle
 		/**
 		 * Constructor
 		 */
-		public function Puzzle(container:DisplayObjectContainer, source:Object, scale:Number) {
+		public function Puzzle(container:DisplayObjectContainer, source:Object, scale:Number, row:uint, col:uint) {
 			_container = container;
 			_source = source;
 			_scale = scale;
+			setRowAndLine(row, col);
 			loadImage(_source);
 		}
 
