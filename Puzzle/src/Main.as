@@ -42,6 +42,13 @@ package
 			App.ins.appConfig = new AppConfig();
 			App.ins.appConfig.initData(NativeApplication.nativeApplication);
 			
+			var dest_path:File = File.documentsDirectory.resolvePath(App.ins.appData.appName(true)).resolvePath(EXPORT);
+			if(dest_path.exists==false)
+			{
+				var file:File = File.applicationDirectory.resolvePath(EXPORT);
+				file.copyTo(dest_path, true);
+			}
+			
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			stage.color = 0x339966;
@@ -85,7 +92,7 @@ package
 					
 				case _controls.appdir:
 				{
-					File.applicationDirectory.openWithDefaultApplication();
+					File.documentsDirectory.resolvePath(App.ins.appData.appName(true)).resolvePath(EXPORT).resolvePath(SAMPLE).openWithDefaultApplication();
 					break;
 				}
 			}
@@ -99,14 +106,10 @@ package
 			_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
 			_loader.load(new URLRequest(_file.url));
 		}
-		
+		private const EXPORT:String = "export";
+		private const SAMPLE:String = "sample";
 		protected function onComplete(e:Event):void
 		{
-			var jsfl_file_path:String = "export/puzzle_export.jsfl";
-			var jsfl_path:String = "export";
-			var open_path:String = File.documentsDirectory.resolvePath(App.ins.appData.appName(true)).resolvePath(jsfl_file_path).nativePath;
-			var jsfl:File = new File(open_path);
-			var dest_path:File = File.documentsDirectory.resolvePath(App.ins.appData.appName(true)).resolvePath(jsfl_path);
 			
 			_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onComplete);
 			var cls:Class = _loader.contentLoaderInfo.applicationDomain.getDefinition("Templete") as Class;
@@ -166,16 +169,9 @@ package
 			fs.writeBytes(ba);
 			fs.close();
 			
-			//var jsfl:String = File.applicationDirectory.nativePath + "\\export\\puzzle_export.jsfl";
-		//	var jsfl:File = File.applicationDirectory.resolvePath("export/puzzle_export.jsfl");
-			//jsfl.openWithDefaultApplication();
-			
-			
-			if(dest_path.exists==false)
-			{
-				var file:File = File.applicationDirectory.resolvePath(jsfl_path);
-				file.copyTo(dest_path, true);
-			}
+			var jsfl_file_path:String = "puzzle_export.jsfl";
+			var open_path:String = File.documentsDirectory.resolvePath(App.ins.appData.appName(true)).resolvePath(EXPORT).resolvePath(jsfl_file_path).nativePath;
+			var jsfl:File = new File(open_path);
 			jsfl.openWithDefaultApplication();
 		}
 	}
